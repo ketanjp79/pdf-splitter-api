@@ -1,13 +1,21 @@
 fastapi
-uvicorn
+uvicorn[standard]
 requests
 python-multipart
+
+# Google APIs
 google-api-python-client
 google-auth
 google-auth-oauthlib
 google-auth-httplib2
 gspread
+
+# Background tasks
 celery[redis]
 redis
-pymupdf<=1.23
+
+# PDF
+pymupdf==1.22.5  # (<=1.23 had breaking changes, 1.22.5 is stable)
+
+# Config
 python-dotenv
