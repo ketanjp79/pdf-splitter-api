@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>📄 PDF Splitter - Google Drive</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; }
+    input, button { width: 100%; padding: 10px; margin: 10px 0; font-size: 1rem; }
+    .result { margin-top: 20px; }
+    .result a { display: block; color: blue; margin-bottom: 5px; }
+    .loading { color: #555; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h2>📄 Split PDF from Google Drive</h2>
+  <form id="splitForm">
+    <label>Google Drive File ID or URL:</label>
+    <input type="text" id="fileId" placeholder="Enter file ID or full URL" required />
+
+    <label>Page Prefixes (optional):</label>
+    <input type="text" id="prefixes" placeholder="e.g., 40-44,49,50" />
+
+    <button type="submit">Split PDF</button>
+  </form>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    const form = document.getElementById("splitForm");
+    const resultDiv = document.getElementById("result");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      resultDiv.innerHTML = "<p class='loading'>Processing...</p>";
+
+      const fileId = document.getElementById("fileId").value;
+      const prefixes = document.getElementById("prefixes").value;
+
+      const formData = new FormData();
+      formData.append("file_id", fileId);
+      if (prefixes) formData.append("prefixes", prefixes);
+
+      try {
+        const response = await fetch("/split/drive", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await response.json();
+
+        if (data.status === "queued" && data.task_id) {
+          resultDiv.innerHTML = "<p class='loading'>Task queued. Waiting for result...</p>";
+          pollResult(data.task_id);
+        } else {
+          resultDiv.innerHTML = `<p class="error">Unexpected response from server.</p>`;
+        }
+      } catch (err) {
+        resultDiv.innerHTML = `<p class="error">❌ Failed to connect to server.</p>`;
+        console.error(err);
+      }
+    });
+
+    function pollResult(taskId) {
+      setTimeout(async () => {
+        try {
+          const res = await fetch(`/result/${taskId}`);
+          const result = await res.json();
+
+          if (result.status === "success") {
+            showLinks(result.links);
+          } else {
+            resultDiv.innerHTML = "<p class='loading'>Still processing... Retrying...</p>";
+            pollResult(taskId);
+          }
+        } catch (err) {
+          resultDiv.innerHTML = `<p class="error">Error polling result.</p>`;
+          console.error(err);
+        }
+      }, 5000); // 5-second retry
+    }
+
+    function showLinks(links) {
+      resultDiv.innerHTML = "<h3>✅ Split PDF Links:</h3>";
+      links.forEach(link => {
+        const a = document.createElement("a");
+        a.href = link;
+        a.textContent = link;
+        a.target = "_blank";
+        resultDiv.appendChild(a);
+      });
+    }
+  </script>
+</body>
+</html>

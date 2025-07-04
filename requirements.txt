@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+requests
+python-multipart
+google-api-python-client
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+gspread
+celery[redis]
+redis
+pymupdf<=1.23
+python-dotenv

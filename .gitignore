@@ -1,0 +1,46 @@
+# Bytecode and compiled files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+
+# Virtual environment
+venv/
+env/
+.venv/
+ENV/
+
+# System and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs and temp files
+*.log
+*.tmp
+*.bak
+
+# Environment variables
+.env
+.env.*
+
+# Celery artifacts
+*.pid
+celerybeat-schedule
+
+# Results or generated output
+results/
+*.pdf
+*.csv
+*.json
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Railway metadata
+.railway/
+
+# Static build caches (if any)
+static/cache/
